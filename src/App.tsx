@@ -35,7 +35,7 @@ function App() {
   };
 
   const handleButtonClick = useCallback(() => {
-    if (inputValueRef.current === 0 || inputValueRef.current > 5000) {
+    if (inputValueRef.current <= 0 || inputValueRef.current > 5000) {
       setState((prevState) => ({ ...prevState, showAlert: true }));
     } else {
       setState((prevState) => ({
