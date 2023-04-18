@@ -47,12 +47,19 @@ function App() {
     }
   }, [inputValueRef, state]);
 
+  const handleCloseAlert = () => {
+    setState((prevState) => ({
+      ...prevState,
+      showAlert: false,
+    }));
+  };
+
   return (
     <Flex flexDirection={"column"} placeContent={"center"} height={"100vh"}>
       <Modal
         isCentered={true}
         isOpen={state.showAlert}
-        onClose={() => {}}
+        onClose={handleCloseAlert}
         size={"lg"}
       >
         <ModalOverlay />
@@ -73,9 +80,7 @@ function App() {
               <CloseButton
                 mb={1}
                 color={"red.400"}
-                onClick={() =>
-                  setState((prevState) => ({ ...prevState, showAlert: false }))
-                }
+                onClick={handleCloseAlert}
               />
             </Alert>
           </ModalHeader>

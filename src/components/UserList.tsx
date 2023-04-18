@@ -7,6 +7,7 @@ import {
   Text,
   Flex,
   Button,
+  CloseButton,
   AlertDialog,
   AlertDialogHeader,
   AlertDialogOverlay,
@@ -15,6 +16,12 @@ import {
   AlertDialogFooter,
   Skeleton,
   IconButton,
+  ModalOverlay,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import { EditIcon, ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -78,6 +85,13 @@ export default function UserList(props: Props) {
     setCurrentPage(currentPage - 1);
   }, [currentPage, setCurrentPage]);
 
+  const handleCloseAlert = () => {
+    setState((prevState) => ({
+      ...prevState,
+      showAlert: false,
+    }));
+  };
+
   useEffect(() => {
     props.setIsLoading(true);
     fetch(
@@ -101,31 +115,67 @@ export default function UserList(props: Props) {
 
   if (state.message !== "" && state.showAlert) {
     return (
-      <AlertDialog
-        isCentered
-        isOpen={state.showAlert}
-        leastDestructiveRef={cancelRef}
-        onClose={() => {}}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Error
-            </AlertDialogHeader>
-            <AlertDialogBody>{state.message}</AlertDialogBody>
-            <AlertDialogFooter>
-              <Button
-                ref={cancelRef}
-                onClick={() => {
-                  setState((prevState) => ({ ...prevState, showAlert: false }));
-                }}
+      <>
+        <Modal
+          isCentered={true}
+          isOpen={state.showAlert}
+          onClose={handleCloseAlert}
+          size={"xl"}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader bgColor={"#6b5c68"} gap={5} rounded={"sm"}>
+              <Alert
+                bgColor={"#6b5c68"}
+                status="error"
+                variant="subtle"
+                display={"flex"}
+                gap={1}
+                justifyContent={"center"}
               >
-                Cancel
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
+                <AlertIcon w={14} h={14} marginBottom={1} />
+                <Box marginBottom={2} paddingTop={1}>
+                  {state.message}
+                </Box>
+                <CloseButton
+                  mb={1}
+                  color={"red.400"}
+                  onClick={handleCloseAlert}
+                />
+              </Alert>
+            </ModalHeader>
+          </ModalContent>
+        </Modal>
+
+        {/* <AlertDialog
+          isCentered
+          isOpen={state.showAlert}
+          leastDestructiveRef={cancelRef}
+          onClose={() => {}}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Error
+              </AlertDialogHeader>
+              <AlertDialogBody>{state.message}</AlertDialogBody>
+              <AlertDialogFooter>
+                <Button
+                  ref={cancelRef}
+                  onClick={() => {
+                    setState((prevState) => ({
+                      ...prevState,
+                      showAlert: false,
+                    }));
+                  }}
+                >
+                  Cancel
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog> */}
+      </>
     );
   }
 
@@ -178,17 +228,19 @@ export default function UserList(props: Props) {
               </ListItem>
             ))}
         </List>
-        <Box display="flex" gap={3} justifyContent="center" marginTop={2}>
-          <Button isDisabled={currentPage === 1} onClick={handlePreviousPage}>
-            <ArrowBackIcon />
-          </Button>
-          <Button
-            isDisabled={currentPage === lastPage}
-            onClick={handleNextPage}
-          >
-            <ArrowForwardIcon />
-          </Button>
-        </Box>
+        {userArray.length > 0 && (
+          <Box display="flex" gap={3} justifyContent="center" marginTop={2}>
+            <Button isDisabled={currentPage === 1} onClick={handlePreviousPage}>
+              <ArrowBackIcon />
+            </Button>
+            <Button
+              isDisabled={currentPage === lastPage}
+              onClick={handleNextPage}
+            >
+              <ArrowForwardIcon />
+            </Button>
+          </Box>
+        )}
       </Container>
 
       {showUserModal && (
