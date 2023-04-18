@@ -71,6 +71,14 @@ export default function UserList(props: Props) {
         }
 
         props.setIsLoading(false);
+      })
+      .catch((error) => {
+        setState((prevState) => ({
+          ...prevState,
+          message: `Uncaught error: ${error.message}`,
+          showAlert: true,
+        }));
+        props.setIsLoading(false);
       });
   }, []);
 
