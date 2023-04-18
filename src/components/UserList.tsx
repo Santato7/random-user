@@ -8,12 +8,6 @@ import {
   Flex,
   Button,
   CloseButton,
-  AlertDialog,
-  AlertDialogHeader,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogBody,
-  AlertDialogFooter,
   Skeleton,
   IconButton,
   ModalOverlay,
@@ -24,7 +18,7 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import { EditIcon, ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import UserModal from "./UserModal";
 import { User } from "../interfaces";
 
@@ -54,43 +48,10 @@ export default function UserList(props: Props) {
   const [showUserModal, setShowUserModal] = useState(false);
   const [userArray, setUserArray] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const cancelRef = useRef<any>();
   const itemsPerPage = 8;
   const cardWidth = 450;
 
   const lastPage = Math.ceil(props.usersQuantity / itemsPerPage);
-
-  const getCurrentUsers = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return userArray.slice(startIndex, endIndex);
-  };
-
-  const handleModal = useCallback(
-    (index: number) => {
-      setState((prevState) => ({
-        ...prevState,
-        selectedUser: userArray[index],
-      }));
-      setShowUserModal(true);
-    },
-    [userArray]
-  );
-
-  const handleNextPage = useCallback(() => {
-    setCurrentPage(currentPage + 1);
-  }, [currentPage, setCurrentPage]);
-
-  const handlePreviousPage = useCallback(() => {
-    setCurrentPage(currentPage - 1);
-  }, [currentPage, setCurrentPage]);
-
-  const handleCloseAlert = () => {
-    setState((prevState) => ({
-      ...prevState,
-      showAlert: false,
-    }));
-  };
 
   useEffect(() => {
     props.setIsLoading(true);
@@ -113,69 +74,71 @@ export default function UserList(props: Props) {
       });
   }, []);
 
+  const getCurrentUsers = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentUsers = userArray.slice(startIndex, endIndex);
+    return currentUsers;
+  };
+
+  const handleModal = useCallback(
+    (index: number) => {
+      setState((prevState) => ({
+        ...prevState,
+        selectedUser: getCurrentUsers()[index],
+      }));
+      setShowUserModal(true);
+    },
+    [userArray, currentPage]
+  );
+
+  const handleNextPage = useCallback(() => {
+    setCurrentPage(currentPage + 1);
+  }, [currentPage, setCurrentPage]);
+
+  const handlePreviousPage = useCallback(() => {
+    setCurrentPage(currentPage - 1);
+  }, [currentPage, setCurrentPage]);
+
+  const handleCloseAlert = () => {
+    setState((prevState) => ({
+      ...prevState,
+      showAlert: false,
+    }));
+  };
+
   if (state.message !== "" && state.showAlert) {
     return (
-      <>
-        <Modal
-          isCentered={true}
-          isOpen={state.showAlert}
-          onClose={handleCloseAlert}
-          size={"xl"}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader bgColor={"#6b5c68"} gap={5} rounded={"sm"}>
-              <Alert
-                bgColor={"#6b5c68"}
-                status="error"
-                variant="subtle"
-                display={"flex"}
-                gap={1}
-                justifyContent={"center"}
-              >
-                <AlertIcon w={14} h={14} marginBottom={1} />
-                <Box marginBottom={2} paddingTop={1}>
-                  {state.message}
-                </Box>
-                <CloseButton
-                  mb={1}
-                  color={"red.400"}
-                  onClick={handleCloseAlert}
-                />
-              </Alert>
-            </ModalHeader>
-          </ModalContent>
-        </Modal>
-
-        {/* <AlertDialog
-          isCentered
-          isOpen={state.showAlert}
-          leastDestructiveRef={cancelRef}
-          onClose={() => {}}
-        >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Error
-              </AlertDialogHeader>
-              <AlertDialogBody>{state.message}</AlertDialogBody>
-              <AlertDialogFooter>
-                <Button
-                  ref={cancelRef}
-                  onClick={() => {
-                    setState((prevState) => ({
-                      ...prevState,
-                      showAlert: false,
-                    }));
-                  }}
-                >
-                  Cancel
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog> */}
-      </>
+      <Modal
+        isCentered={true}
+        isOpen={state.showAlert}
+        onClose={handleCloseAlert}
+        size={"xl"}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader bgColor={"#6b5c68"} gap={5} rounded={"sm"}>
+            <Alert
+              bgColor={"#6b5c68"}
+              status="error"
+              variant="subtle"
+              display={"flex"}
+              gap={1}
+              justifyContent={"center"}
+            >
+              <AlertIcon w={14} h={14} marginBottom={1} />
+              <Box marginBottom={2} paddingTop={1}>
+                {state.message}
+              </Box>
+              <CloseButton
+                mb={1}
+                color={"red.400"}
+                onClick={handleCloseAlert}
+              />
+            </Alert>
+          </ModalHeader>
+        </ModalContent>
+      </Modal>
     );
   }
 
